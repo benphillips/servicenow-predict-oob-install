@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_user_role">
+    <sys_user_role action="INSERT_OR_UPDATE">
+        <assignable_by/>
+        <can_delegate>true</can_delegate>
+        <description>Astound Predict administrator role</description>
+        <elevated_privilege>false</elevated_privilege>
+        <grantable>true</grantable>
+        <includes_roles/>
+        <name>x_na_astound_predi.admin</name>
+        <scoped_admin>false</scoped_admin>
+        <suffix>admin</suffix>
+        <sys_class_name>sys_user_role</sys_class_name>
+        <sys_created_by>ben.phillips</sys_created_by>
+        <sys_created_on>2018-02-15 00:49:14</sys_created_on>
+        <sys_id>d6f34461db989b00bfa8d001cf96192d</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>x_na_astound_predi.admin</sys_name>
+        <sys_package display_value="Astound Predict" source="x_na_astound_predi">b8af7751db989b00bfa8d001cf961929</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="Astound Predict">b8af7751db989b00bfa8d001cf961929</sys_scope>
+        <sys_update_name>sys_user_role_d6f34461db989b00bfa8d001cf96192d</sys_update_name>
+        <sys_updated_by>ben.phillips</sys_updated_by>
+        <sys_updated_on>2018-02-15 00:49:14</sys_updated_on>
+    </sys_user_role>
+</record_update>

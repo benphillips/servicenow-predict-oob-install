@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_ws_operation">
+    <sys_ws_operation action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <consumes>application/json,application/xml,text/xml</consumes>
+        <consumes_customized>false</consumes_customized>
+        <default_operation_uri/>
+        <enforce_acl>81fe71cedb90db00bfa8d001cf96196f</enforce_acl>
+        <http_method>POST</http_method>
+        <name>getprediction</name>
+        <operation_script><![CDATA[(function process(/*RESTAPIRequest*/ request, /*RESTAPIResponse*/ response) {
+	gs.debug("ASTOUND DEBUG: PREDICT: Scripted REST API getprediction: " + JSON.stringify(request.body.data) + " data type is: " + typeof request.body.data);
+	var pred = new x_na_astound_predi.Predict(); //Script Include
+	return pred.getPrediction(request.body.data,null); //name of function in Script Include we're invoking
+})(request, response);]]></operation_script>
+        <operation_uri>/api/x_na_astound_predi/predict/getprediction</operation_uri>
+        <produces>application/json,application/xml,text/xml</produces>
+        <produces_customized>false</produces_customized>
+        <relative_path>/getprediction</relative_path>
+        <request_example/>
+        <requires_acl_authorization>true</requires_acl_authorization>
+        <requires_authentication>true</requires_authentication>
+        <short_description/>
+        <sys_class_name>sys_ws_operation</sys_class_name>
+        <sys_created_by>ben.phillips</sys_created_by>
+        <sys_created_on>2018-02-21 00:03:35</sys_created_on>
+        <sys_id>3aa23617db541f00bfa8d001cf9619aa</sys_id>
+        <sys_mod_count>37</sys_mod_count>
+        <sys_name>getprediction</sys_name>
+        <sys_package display_value="Astound Predict" source="x_na_astound_predi">b8af7751db989b00bfa8d001cf961929</sys_package>
+        <sys_policy>protected</sys_policy>
+        <sys_scope display_value="Astound Predict">b8af7751db989b00bfa8d001cf961929</sys_scope>
+        <sys_update_name>sys_ws_operation_3aa23617db541f00bfa8d001cf9619aa</sys_update_name>
+        <sys_updated_by>ben.phillips</sys_updated_by>
+        <sys_updated_on>2018-03-26 23:26:51</sys_updated_on>
+        <web_service_definition display_value="Predict">9fea6653db541f00bfa8d001cf961990</web_service_definition>
+        <web_service_version/>
+    </sys_ws_operation>
+</record_update>

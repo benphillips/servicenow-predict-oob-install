@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_na_astound_predi.Predict</api_name>
+        <client_callable>true</client_callable>
+        <description>Astound Predict script include, used for getting predictions and processing logic on certain fields. Called by the UI Script and by the Scripted REST APIs.</description>
+        <name>Predict</name>
+        <script><![CDATA[var Predict = Class.create();
+Predict.prototype = Object.extendsObject(global.AbstractAjaxProcessor, {
+  
+	//This gets triggered by the scripted REST API /api/x_na_astound_advis/Advise/getknowledgeresults and constructs the REST message to get the data.
+	getPrediction: function(parmsFromServer, cb) {
+		
+		gs.debug("ASTOUND DEBUG: PREDICT: BEGIN " + global.JSON.stringify(parmsFromServer));
+
+		var event_guid = gs.generateGUID();
+		var	gr = new GlideRecord(parmsFromServer.table);
+		var bodyString;
+		var targetField = gs.getProperty("x_na_astound_predi.target.1.field");
+		//1: construct the body of the request. 
+		var body = {};
+		//titan requirements
+		body.threshold = -1;
+		body.userId = gs.getUserID();
+		body.event_guid = event_guid;
+		
+		if(parmsFromServer.current) {
+			gr.addQuery("sys_id",parmsFromServer.sys_id);
+			gr.query();
+			if(gr.next()) {
+				//BACKEND
+				//if parmsFromServer.current will tell us that we triggered this from a business rule. in that case we need to use gr instead of g_form.  
+				body.created_on = gr.getDisplayValue("sys_created_on");
+				body.sys_id = gr.getUniqueValue();
+				body.updated_on = gr.getDisplayValue("sys_updated_on");
+				body.short_description = gr.getValue("short_description");
+				body.description = gr.getValue("description");
+				body.u_affected_environment = gr.getValue("u_affected_environment");
+				body.location = gr.getValue("location");
+				body.u_situation =  gr.getValue("u_situation");
+				body.u_workplace_location =  gr.getValue("u_workplace_location");
+				body.urgency = gr.getValue("urgency");
+				body.current_subcategory =  gr.getValue("subcategory");
+				body.current_subcategory_display_value =  gr.getDisplayValue("subcategory");
+				body.caller_id =  gr.getValue("caller_id");
+				body.u_requester_situation =  gr.getValue("u_requester_situation");
+			} //end gr loop 
+		} else {
+			//FRONTEND    
+			//we got these values from the ui script so we used g_form to collect.
+			body.created_on = parmsFromServer.sys_created_on;
+			body.sys_id = parmsFromServer.sys_id;
+			body.updated_on = parmsFromServer.sys_updated_on;
+			body.short_description = parmsFromServer.short_description;
+			body.description = parmsFromServer.description;
+			body.u_affected_environment = parmsFromServer.u_affected_environment;
+			body.location = parmsFromServer.location;
+			body.u_situation =  parmsFromServer.u_situation;
+			body.u_workplace_location =  parmsFromServer.u_workplace_location;
+			body.urgency = parmsFromServer.urgency;
+			body.current_subcategory =  parmsFromServer.current_subcategory;
+			body.current_subcategory_display_value =  parmsFromServer.current_subcategory_display_value;
+			body.caller_id =  parmsFromServer.caller_id;
+			body.u_requester_situation =  parmsFromServer.u_requester_situation;
+		}
+		bodyString = global.JSON.stringify(body);
+		gs.debug("ASTOUND DEBUG: PREDICT: REQUEST BODY: \n" + bodyString);
+		
+		//2: ask our api for a result.
+		try {
+			var r = new sn_ws.RESTMessageV2('x_na_astound_predi.AstoundPredict', 'post');
+			r.setStringParameter('event_guid', event_guid);
+			r.setStringParameter('k', parmsFromServer.k);
+			r.setStringParameter('instance', gs.getProperty('instance_name'));
+			r.setStringParameter('source', parmsFromServer.table + ":" + parmsFromServer.sys_id);
+			r.setRequestBody(bodyString);
+			var response = r.executeAsync();
+			var responseBody = response.getBody();
+			var httpStatus = response.getStatusCode();
+			var responseBodyJSON = global.JSON.parse(responseBody);
+			
+			gs.debug("ASTOUND DEBUG: PREDICT: getPrediction: PROCESSED: post to endpoint: " + r.getEndpoint() + "\n" + 
+			"getRequestBody " + r.getRequestBody() + "\n" + 
+			"RESULT: getAstoundCategories for " + gr.getDisplayValue() + " response: " + httpStatus + "\n" +
+			"responseBody: \n" + responseBody);
+			
+			//3: compile and do some servicenow logic.
+			var resultsArrObj = responseBodyJSON.results;
+			var serviceName = "";
+			var predictionList = [];
+			
+			if (!gs.nil(resultsArrObj)) {
+				for (var i = 0; i < resultsArrObj.length; i++) {
+				  var item = resultsArrObj[i];
+				  var name = item[targetField].toString();
+				  var result_sys_id = item[targetField+"_id"].toString();
+				  var precision = parseInt(item.precision*100);
+				  gs.debug("ASTOUND DEBUG: PREDICT: name: " + name + " result_sys_id: " + result_sys_id);
+				  //check for empty strings. if empty string is returned, do not update the view. 
+				  if(name == "") {
+					gs.error("Astound Error: Automap returned an empty string as a result. Endpoint: " + r.getEndpoint() + "\n" + 
+					"source: " + table + ":" + sys_id + "\n" +
+					"getRequestBody: " + r.getRequestBody() + "\n responseBody: \n" + responseBody);
+				  }
+				  var o = {};
+				  if(targetField == "subcategory") {
+					var svc = new GlideRecord("cmdb_ci_service");
+					svc.addQuery("sys_id", result_sys_id);
+					svc.query();
+					while (svc.next()) {
+					  category = svc.getValue("category");
+					  o.id = result_sys_id;
+					  o.category = category;
+					  o.name = name;
+					  o.precision = precision;
+					 // o.event_guid = event_guid;
+					  predictionList.push(o);
+					}
+				  } else if(targetField == "assignment_group") {
+					var ag = new GlideRecord("sys_user_group");
+					ag.addQuery("sys_id", result_sys_id);
+					ag.query();
+					while (ag.next()) {
+					  o.id = result_sys_id;
+					  o.name = name;
+					  o.precision = precision;
+					  predictionList.push(o);
+					}
+				  }//if(field == ...) 
+				}//end for loop results iterator 
+			  }//end if (!gs.nil(resultsArrObj))			
+			//4: return.
+			gs.debug("ASTOUND DEBUG: PREDICT: SUCCESS: Categories: " + global.JSON.stringify(predictionList));
+			
+			if (cb) {
+			  cb();
+			}
+			return global.JSON.stringify(predictionList);
+		} catch (e) { gs.error("ASTOUND DEBUG: PREDICT: ERROR: " + e);}
+	}, //end getPrediction
+    type: 'Predict'
+});]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>ben.phillips</sys_created_by>
+        <sys_created_on>2018-02-15 01:12:18</sys_created_on>
+        <sys_id>29e808e1db989b00bfa8d001cf9619d9</sys_id>
+        <sys_mod_count>67</sys_mod_count>
+        <sys_name>Predict</sys_name>
+        <sys_package display_value="Astound Predict" source="x_na_astound_predi">b8af7751db989b00bfa8d001cf961929</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="Astound Predict">b8af7751db989b00bfa8d001cf961929</sys_scope>
+        <sys_update_name>sys_script_include_29e808e1db989b00bfa8d001cf9619d9</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2018-04-20 21:48:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

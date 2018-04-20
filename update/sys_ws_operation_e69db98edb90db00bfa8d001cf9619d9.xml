@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_ws_operation">
+    <sys_ws_operation action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <consumes>application/json,application/xml,text/xml</consumes>
+        <consumes_customized>false</consumes_customized>
+        <default_operation_uri/>
+        <enforce_acl/>
+        <http_method>POST</http_method>
+        <name>post</name>
+        <operation_script><![CDATA[(function process(/*RESTAPIRequest*/ request, /*RESTAPIResponse*/ response) {
+	try {
+		gs.debug("ASTOUND DEBUG: PREDICT: EVENTS: sending /api/x_na_astound_predi/session/post");
+		var pv = String(request.queryParams.predictedValue);
+		var eg = String(request.queryParams.event_guid);
+		var table = String(request.queryParams.table);
+		var sys_id = String(request.queryParams.sys_id);
+		var ignored = String(request.queryParams.ignored);
+
+		var predictedValueObject = {
+			"ignored" : ignored,
+			"event_guid" : eg
+		};
+		
+		//user is on incident 456.
+		//we ran and returned a pv of 888.
+		//we get their session for predictedValueObjectincident456_888.
+		//if there isn't one, go to [B].
+		//if there is one, check for predictedValueObjectincident456_888.ignored. if true, they clicked ignore for this predicted value in the past at some point, so hide the badge.
+		//[B] if our current pv is new, then remove ALL the things starting with predictedValueObjectincident456 and insert our new one.
+
+		
+		//erorr: we need to remove the old cookies here! 
+		
+		
+		gs.getSession().putClientData("predictedValueObject"+table+sys_id+"_"+pv,JSON.stringify(predictedValueObject));
+		
+		gs.debug("ASTOUND DEBUG: PREDICT: gs.getSession().getClientData(predictedValueObject"+table+sys_id+"_"+pv+") : \n" + gs.getSession().getClientData("predictedValueObject"+table+sys_id+"_"+pv));
+		
+	} catch(err) {
+		gs.error("Astound Error: Error in scripted REST resource AstoundSession \n" + err);
+	}
+})(request, response);]]></operation_script>
+        <operation_uri>/api/x_na_astound_predi/session/post</operation_uri>
+        <produces>application/json,application/xml,text/xml</produces>
+        <produces_customized>false</produces_customized>
+        <relative_path>/post</relative_path>
+        <request_example/>
+        <requires_acl_authorization>false</requires_acl_authorization>
+        <requires_authentication>false</requires_authentication>
+        <short_description/>
+        <sys_class_name>sys_ws_operation</sys_class_name>
+        <sys_created_by>ben.phillips</sys_created_by>
+        <sys_created_on>2018-02-16 23:00:16</sys_created_on>
+        <sys_id>e69db98edb90db00bfa8d001cf9619d9</sys_id>
+        <sys_mod_count>13</sys_mod_count>
+        <sys_name>post</sys_name>
+        <sys_package display_value="Astound Predict" source="x_na_astound_predi">b8af7751db989b00bfa8d001cf961929</sys_package>
+        <sys_policy>protected</sys_policy>
+        <sys_scope display_value="Astound Predict">b8af7751db989b00bfa8d001cf961929</sys_scope>
+        <sys_update_name>sys_ws_operation_e69db98edb90db00bfa8d001cf9619d9</sys_update_name>
+        <sys_updated_by>ben.phillips</sys_updated_by>
+        <sys_updated_on>2018-03-14 23:58:58</sys_updated_on>
+        <web_service_definition display_value="AstoundSession">3f4570b5db9c9b00bfa8d001cf961928</web_service_definition>
+        <web_service_version/>
+    </sys_ws_operation>
+</record_update>

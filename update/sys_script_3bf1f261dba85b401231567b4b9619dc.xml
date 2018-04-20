@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update sys_domain="global" table="sys_script">
+    <sys_script action="INSERT_OR_UPDATE">
+        <abort_action>false</abort_action>
+        <access>package_private</access>
+        <action_delete>false</action_delete>
+        <action_insert>false</action_insert>
+        <action_query>false</action_query>
+        <action_update>true</action_update>
+        <active>true</active>
+        <add_message>false</add_message>
+        <advanced>true</advanced>
+        <change_fields>false</change_fields>
+        <client_callable>false</client_callable>
+        <collection>incident</collection>
+        <condition/>
+        <description>The purpose of this business rule is that anytime the short desc, desc, or business service values of an incident are changed, to run Astound Predict again and store the latest predicted value to the hidden field x_na_astound_predi_[target field name]. This is used mainly for metrics to determine accuracy when it is compared against the business service field.&#13;
+&#13;
+This sends the Logs on the Update events.</description>
+        <execute_function>false</execute_function>
+        <filter_condition table="incident">short_descriptionVALCHANGES^ORdescriptionVALCHANGES^ORsubcategoryVALCHANGES^EQ<item endquery="false" field="short_description" goto="false" newquery="false" operator="VALCHANGES" or="false" value=""/>
+            <item endquery="false" field="description" goto="false" newquery="false" operator="VALCHANGES" or="true" value=""/>
+            <item endquery="false" field="subcategory" goto="false" newquery="false" operator="VALCHANGES" or="true" value=""/>
+            <item endquery="true" field="" goto="false" newquery="false" operator="=" or="false" value=""/>
+        </filter_condition>
+        <is_rest>false</is_rest>
+        <message/>
+        <name>onUpdate-Predict</name>
+        <order>5000</order>
+        <priority>100</priority>
+        <rest_method/>
+        <rest_method_text/>
+        <rest_service/>
+        <rest_service_text/>
+        <rest_variables/>
+        <role_conditions/>
+        <script><![CDATA[(function executeRule() {
+	gs.debug("ASTOUND DEBUG: PREDICT: onUpdate br: running.");
+	var pred = new x_na_astound_predi.Predict();
+	var parms = {};
+	parms.table = current.sys_class_name.toString();
+	parms.sys_id = current.sys_id.toString();
+	parms.field = gs.getProperty("x_na_astound_predi.target.1.field");
+	parms.k = 1;
+	parms.current = current;
+	gs.debug("ASTOUND DEBUG: PREDICT: onUpdate br: "+current.number+" setting parms: " +  JSON.stringify(parms));
+	var response =	pred.getPrediction(parms);
+	var jsonResponse = global.JSON.parse(response);
+	gs.debug("ASTOUND DEBUG: PREDICT: onUpdate br: response: " + response);
+	if(!jsonResponse)
+		return;
+
+	//save our predicted value to x_na_astound_predi_subcategory, even if it is the same as current value.
+	current.setValue("x_na_astound_predi_"+parms.field,jsonResponse[0].id);
+	var logs = new x_na_astound_predi.Logs();
+	logs.log(current,previous);
+	current.update();
+})(current, previous);]]></script>
+        <sys_class_name>sys_script</sys_class_name>
+        <sys_created_by>ben.phillips</sys_created_by>
+        <sys_created_on>2018-02-27 23:45:53</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>3bf1f261dba85b401231567b4b9619dc</sys_id>
+        <sys_mod_count>28</sys_mod_count>
+        <sys_name>onUpdate-Predict</sys_name>
+        <sys_overrides/>
+        <sys_package display_value="Astound Predict" source="x_na_astound_predi">b8af7751db989b00bfa8d001cf961929</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="Astound Predict">b8af7751db989b00bfa8d001cf961929</sys_scope>
+        <sys_update_name>sys_script_3bf1f261dba85b401231567b4b9619dc</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2018-04-20 22:01:31</sys_updated_on>
+        <template/>
+        <when>after</when>
+    </sys_script>
+    <sys_translated_text action="delete_multiple" query="documentkey=3bf1f261dba85b401231567b4b9619dc"/>
+</record_update>

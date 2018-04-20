@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_ui_formatter">
+    <sys_ui_formatter action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <angular_module/>
+        <formatter>predict_app</formatter>
+        <name>predict_app</name>
+        <sys_class_name>sys_ui_formatter</sys_class_name>
+        <sys_created_by>ben.phillips</sys_created_by>
+        <sys_created_on>2018-02-20 23:09:47</sys_created_on>
+        <sys_id>1ab6e2dbdbd01f00bfa8d001cf96198a</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>predict_app</sys_name>
+        <sys_package display_value="Astound Predict" source="x_na_astound_predi">b8af7751db989b00bfa8d001cf961929</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="Astound Predict">b8af7751db989b00bfa8d001cf961929</sys_scope>
+        <sys_update_name>sys_ui_formatter_1ab6e2dbdbd01f00bfa8d001cf96198a</sys_update_name>
+        <sys_updated_by>ben.phillips</sys_updated_by>
+        <sys_updated_on>2018-02-20 23:09:47</sys_updated_on>
+        <table>incident</table>
+        <type>formatter</type>
+    </sys_ui_formatter>
+</record_update>

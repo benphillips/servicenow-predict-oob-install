@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update sys_domain="global" table="sys_script">
+    <sys_script action="INSERT_OR_UPDATE">
+        <abort_action>false</abort_action>
+        <access>package_private</access>
+        <action_delete>false</action_delete>
+        <action_insert>true</action_insert>
+        <action_query>false</action_query>
+        <action_update>false</action_update>
+        <active>true</active>
+        <add_message>false</add_message>
+        <advanced>true</advanced>
+        <change_fields>false</change_fields>
+        <client_callable>false</client_callable>
+        <collection>incident</collection>
+        <condition/>
+        <description>When an incident is inserted, Astound predicts the best subcategory ("Business Service") for it and updates the record. </description>
+        <execute_function>false</execute_function>
+        <filter_condition/>
+        <is_rest>false</is_rest>
+        <message/>
+        <name>onInsert-Predict</name>
+        <order>5000</order>
+        <priority>100</priority>
+        <rest_method/>
+        <rest_method_text/>
+        <rest_service/>
+        <rest_service_text/>
+        <rest_variables/>
+        <role_conditions/>
+        <script><![CDATA[(function executeRule(current, previous /*null when async*/ ) {
+	gs.debug("ASTOUND DEBUG: PREDICT: ONINSERT BR: insert running.");
+	var pred = new x_na_astound_predi.Predict();
+	var parms = {};
+	parms.table = current.sys_class_name.toString();
+	parms.sys_id = current.sys_id.toString();
+	parms.field = gs.getProperty("x_na_astound_predi.target.1.field");
+	parms.k = 1;
+	parms.current = current;
+	
+	gs.debug("ASTOUND DEBUG: PREDICT: ONINSERT BR: "+current.number+" setting parms: " + global.JSON.stringify(parms));
+	var response = pred.getPrediction(parms);
+	gs.debug("ASTOUND DEBUG: PREDICT: ONINSERT BR: response: " + global.JSON.stringify(response));
+	var jsonResponse = global.JSON.parse(response);	
+
+	if(!jsonResponse)
+		return;
+
+	//save our predicted value to x_na_astound_predi_subcategory, even if it is the same as current value.
+	current.setValue("x_na_astound_predi_"+parms.field,jsonResponse[0].id);
+
+	//check for if current value is same as predicted value.
+	var curVal = current.getValue(parms.field);
+	if (curVal != jsonResponse[0].id)
+			current.setValue(parms.field,jsonResponse[0].id);
+
+	current.setValue("x_na_astound_predi_"+parms.field+"_inserted",true);
+	current.update();
+})(current, previous);]]></script>
+        <sys_class_name>sys_script</sys_class_name>
+        <sys_created_by>ben.phillips</sys_created_by>
+        <sys_created_on>2018-02-27 20:45:05</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>40684625dbe05b401231567b4b961902</sys_id>
+        <sys_mod_count>15</sys_mod_count>
+        <sys_name>onInsert-Predict</sys_name>
+        <sys_overrides/>
+        <sys_package display_value="Astound Predict" source="x_na_astound_predi">b8af7751db989b00bfa8d001cf961929</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="Astound Predict">b8af7751db989b00bfa8d001cf961929</sys_scope>
+        <sys_update_name>sys_script_40684625dbe05b401231567b4b961902</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2018-04-20 22:17:47</sys_updated_on>
+        <template/>
+        <when>after</when>
+    </sys_script>
+    <sys_translated_text action="delete_multiple" query="documentkey=40684625dbe05b401231567b4b961902"/>
+</record_update>

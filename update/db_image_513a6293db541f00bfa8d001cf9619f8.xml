@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="db_image">
+    <db_image action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <category>system</category>
+        <format>png</format>
+        <height>24</height>
+        <image/>
+        <name>astound-predict-logo-small.png</name>
+        <size_bytes>1279</size_bytes>
+        <sys_class_name>db_image</sys_class_name>
+        <sys_created_by>ben.phillips</sys_created_by>
+        <sys_created_on>2018-02-20 23:25:42</sys_created_on>
+        <sys_id>513a6293db541f00bfa8d001cf9619f8</sys_id>
+        <sys_mod_count>1</sys_mod_count>
+        <sys_name>astound-predict-logo-small.png</sys_name>
+        <sys_package display_value="Astound Predict" source="x_na_astound_predi">b8af7751db989b00bfa8d001cf961929</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="Astound Predict">b8af7751db989b00bfa8d001cf961929</sys_scope>
+        <sys_update_name>db_image_513a6293db541f00bfa8d001cf9619f8</sys_update_name>
+        <sys_updated_by>ben.phillips</sys_updated_by>
+        <sys_updated_on>2018-02-20 23:25:52</sys_updated_on>
+        <thumbnail/>
+        <width>32</width>
+    </db_image>
+    <sys_attachment action="INSERT_OR_UPDATE">
+        <average_image_color/>
+        <chunk_size_bytes/>
+        <compressed>true</compressed>
+        <content_type>image/png</content_type>
+        <file_name>image</file_name>
+        <image_height/>
+        <image_width/>
+        <size_bytes>1279</size_bytes>
+        <size_compressed>1302</size_compressed>
+        <sys_created_by>ben.phillips</sys_created_by>
+        <sys_created_on>2018-02-20 23:25:52</sys_created_on>
+        <sys_id>fb7a2e53db541f00bfa8d001cf961998</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>ben.phillips</sys_updated_by>
+        <sys_updated_on>2018-02-20 23:25:52</sys_updated_on>
+        <table_name>ZZ_YYdb_image</table_name>
+        <table_sys_id>513a6293db541f00bfa8d001cf9619f8</table_sys_id>
+    </sys_attachment>
+    <sys_attachment_doc action="INSERT_OR_UPDATE">
+        <data>H4sIAAAAAAAAAA==</data>
+        <length>16</length>
+        <position>0</position>
+        <sys_attachment display_value="image" sys_id="fb7a2e53db541f00bfa8d001cf961998">fb7a2e53db541f00bfa8d001cf961998</sys_attachment>
+        <sys_created_by>ben.phillips</sys_created_by>
+        <sys_created_on>2018-02-20 23:25:52</sys_created_on>
+        <sys_id>3f7a2e53db541f00bfa8d001cf961998</sys_id>
+    </sys_attachment_doc>
+    <sys_attachment_doc action="INSERT_OR_UPDATE">
+        <data>Af8EAPuJUE5HDQoaCgAAAA1JSERSAAAAIAAAABgIBgAAAJtT/zQAAAABc1JHQgCuzhzpAAAACXBIWXMAABcSAAAXEgFnn9JSAAAEpElEQVRIDcVVXUwcVRQ+996Z/V92W2CXUqmt2JS6QEqxapRgjdX0x0StiUkTa2yq1fTBBFNeJNF98cEXjaZIwJRE4oOh+lBTCKgptA9NfaixrYmpiKXUsPw1DOyyy87O3OuZgV1mYVf+YrzJzJx7zj33++75uQOwkREO00dbWio3sgXdiPPeQKAGJOl8dUtLYL37sPU6QmcnK1XVZsntrqOaJkZqay9Bf79Y637rjkDt1NSzhNIjejwOgpC3qgOBnWsFN9avi8Ch7m47EaIJCUiCc6CStMkmSY2ANbFWEmt2MADGhodfwtzX81TKxDO/hBzbU1pa+58TqPjqbCGltAkIWcQSAgiTXDKHDw51f25fNKwsSSsvsawQgjzZ++3xhAZVXFMtBhSRD6Gug5DwHsBZV7Yx/8xyjPyL0pY3B757YLfP31/nKyonwNNq80sxIrEkh89+/P3y1cGRI2ONjbNZC/JMVl0DYSGo32k/NU55+QRP6C4bA7uNZh6nxODnwTH9zkS8vsznO5oHb5l61QSika4ayqTTekqDGzNRmMXeB+x6TD+2EoHh6TjvuRHBxgCCqvcrm5vLlqHlUKyKQPhOn4MAeZfKrBB0DpOaSgfnEjxdh0IX8NNvETE5q1Iy35YVdsZOGJdVDsws1aoIxBxzTzAqHdVVzXSmWPQDszGIpjQhEwqD92f5tYEJIi3sxnUdu4KdfExRyrPQckxWJBAe7/NQAg3UxjxGvAke2yg4RdeYEYWUpsMPN0fEdEI3oo85QRSMEjC2TdPFO3CqVc6Bm1H9exsi3tWO2yd8AfdhgacyE77gauBM0EkSeTAQGUrMlZSUOFCz2FRGephsP/neXuelT9rgYgZxibDoscRgTOs7vtyhROIXJn4drRIq3npZqykwwu89dTzUXLhrcxOe3Cu4QWt+GJLbboP9hYU9ZT7bsRpSo6Rt1m/eCITxXr+Y5K8zryMUi6o8elcxEC2+TEAq9c24rrQ+5N+yD3P+ipacv5qNRZyAqHB7xMPegqdVSL6Aqq8tzhkxbw18v3XrLkHYG5JTosE9QWBOWQBmGRg+EvKW4C9g9nP9LzcoKteauS7uY3FglgRwwcFFqNjpdBk3thOZn74lbgUzqBYhJ4FQZ6cN/3YfYcFtF1j5vm1+WhQq5oAtZg4COsofws2W28b8Xkn8SkpNnsW/omnG37Oo8hSIzbKNJoWKXOXHNc7PmMYlr5wE7IryPN4ozwEWnpFLo6CKQ8XUVuBABujCxWVUZgrrPHlVlxm0Cy31B6BQLNv5DpeTcuOWwqGDRhmhr2EUqk2F5bWMQG1rqw+VZzCnHjwJ4lEkgXHc5CKBygBF8CQI/ilcb5u27AMft13/W9f0LxiuD3k9zE1thBGGZTN/FzmIPaiD3tAn+rLqLmtibsjYMxj6LVxV/zSPvoDCscKLdgdBuav0xEZjvVZwUw6H+dSBC+01j8j7tzu8lZrAtrWMJEkC4XRfkAaNKPySNi0jMDczc4V5vQcZY1ykUhiC+UFkLEIPI/6S6ZlY17nFck8vwG973YvRjtHet2Wgrjm8IZcOP3XAEAxNLtX/r/N/APQQrcEqdWpsAAAAAElFTkSuQmCCovh1av8EAAA=</data>
+        <length>1724</length>
+        <position>1</position>
+        <sys_attachment display_value="image" sys_id="fb7a2e53db541f00bfa8d001cf961998">fb7a2e53db541f00bfa8d001cf961998</sys_attachment>
+        <sys_created_by>ben.phillips</sys_created_by>
+        <sys_created_on>2018-02-20 23:25:52</sys_created_on>
+        <sys_id>bf7a2e53db541f00bfa8d001cf961998</sys_id>
+    </sys_attachment_doc>
+</record_update>

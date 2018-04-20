@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_ui_script">
+    <sys_ui_script action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <description>AngularJS controller and module definition for the Astound Predict application.</description>
+        <global>false</global>
+        <name>x_na_astound_predi.client_logic</name>
+        <script><![CDATA[//our controller's logic.
+function PredictAppCtrlFunction($scope, $sce, $http) {
+  /*
+  * Variables from UI Macro:
+  * targetField = the string name of the field (column) that this Predict implementation is targeting.
+  * debugAstoundPredict = app logging verbosity level
+  * isAustralia = boolean we are getting from the UI Macro if the current record is in an Australian domain. 
+  */
+  var json_response = {};
+  var badge = $j('#astoundFieldBadge');
+  var _reqObj = {};
+  var precision;
+  var predictedValue = "";
+  $scope.targetField = targetField;
+  $scope.curPredSessionObj = {};
+  $scope.timer = ""; //timer variable for field watch
+  $scope.searcherType = ''; //type of searcher in use
+  $scope.delayInterval = 500;
+
+  var listeningFieldsArray = []; //Array of additional fields whose value is needed to process search results, as specified in searcher definition
+  
+  //runs on load.
+  $scope.init = function (){
+    
+  //console.log("astound predict: $scope.ignored = " +$scope.ignored);
+    
+    if(isAustralia)
+      return; //australia deactivation 
+        
+    if (debugAstoundPredict == "debug")
+      console.log('AstoundPredict: Is starting...');
+    
+    if(!badge)
+      badge = $j('#astoundFieldBadge');
+
+    //Determine if g_form object exists
+    var gFormExists = true;
+    try{
+      g_form.isNewRecord();
+      if (g_form.isNewRecord() === null)
+        gFormExists = false;
+    }
+    catch(gFormErr){gFormExists = false;}
+    
+  if(g_form.isNewRecord())
+    badge.hide();
+    
+  if(g_form.getValue("state") == "7")     //7 is closed. don't run predict.
+    return;
+    
+  listeningFieldsArray.push($scope.targetField);
+  listeningFieldsArray.push("short_description");
+  listeningFieldsArray.push("description");
+    
+  //Setup field watches for additional fields
+  for (var i = 0; i < listeningFieldsArray.length; i++) {
+    $scope.setFieldWatch($scope.searcherType, listeningFieldsArray[i]);
+  }
+  if(!g_form.isNewRecord())
+    $scope.predict(); //predict eventually runs predict.
+  };
+  
+  $scope.predict = function() {
+    if (debugAstoundPredict == "debug")
+      console.log("AstoundPredict: predict()");
+    
+	  try {
+		//first we build our object with data from the ui side on the form, to send to our scripted REST api which forwards it to our
+		//Predict service via the REST message. the rest of the object is generated in the script include from the back-end data of the record. 
+		var reqObj = {};
+		reqObj.table = g_form.getTableName();
+		reqObj.sys_id = g_form.getUniqueValue();
+		reqObj.field = $scope.targetField;
+		reqObj.k = 1;
+		reqObj.description = g_form.getValue("description");
+		reqObj.short_description = g_form.getValue("short_description");
+		reqObj.u_affected_environment = g_form.getValue("u_affected_environment");
+		reqObj.location = g_form.getValue("location");
+		reqObj.u_situation = g_form.getValue("u_situation");
+		reqObj.u_workplace_location = g_form.getValue("u_workplace_location");
+		reqObj.urgency = g_form.getValue("urgency");
+		reqObj.current_subcategory = g_form.getValue("subcategory");
+		reqObj.current_subcategory_display_value = g_form.getDisplayValue("subcategory");
+		reqObj.u_requester_situation = g_form.getValue("u_requester_situation");
+		reqObj.caller_id = g_form.getValue("caller_id");
+		_reqObj = reqObj; //save our request object.
+		if (debugAstoundPredict == "debug")
+		  console.log("Astound Predict url post");
+
+		var url = "/api/x_na_astound_predi/predict/getprediction";
+		$http.post(url, reqObj).success(function(response){
+			console.log("getprediction success. response = " + response);
+		  json_response = JSON.parse(response.result);
+		  $scope.updateView();
+		});
+	  } catch(err) {console.error("Astound Error: error posting to " + url + "\n" + err);}
+}; //end predict 
+  
+$scope.updateView = function() {
+    if (debugAstoundPredict == "debug")    
+      console.log("AstoundPredict: updateView() json_response: " + json_response.toString());
+  
+    if(!json_response || !json_response[0] || json_response == []) { //check for null or undefined
+      //we did not get a response. throw error and hide badge. 
+      $scope.errorCSS();
+      if (debugAstoundPredict == "debug")
+        console.warn("AstoundPredict: WARNING: json_response is empty. No valid values returned from Predict service.");
+      return;
+    }
+ 
+    predictedValue = json_response[0].name;
+ 
+    if (debugAstoundPredict == "debug")
+      console.log("AstoundPredict: predictedValue: " + predictedValue);
+
+    //test for null names
+    if(predictedValue == "") {
+      $scope.errorCSS();
+      if (debugAstoundPredict == "debug") 
+        console.warn("AstoundPredict: WARNING: Predict result name is empty string.");
+      return;
+    }
+    $scope.getPredSessionObj(json_response[0],function(result) { //callback
+	  console.log("Astound Predict:getPredSessionObj callback. result = " + typeof result + " " + result);
+      precision = parseInt(json_response[0].precision);
+      if(precision > 99)
+        precision = 99;
+
+	  if(!result) { //we have not stored the value yet. store it now.
+        console.log("Predict: getPredSessionObj: we have not stored the value yet. store it now.");
+        $scope.storePredSessionObj(json_response[0],false,function(){
+			console.log("storePredSessionObj case 1");
+			//resume updateView
+			if(predictedValue != g_form.getDisplayBox(_reqObj.field).value ) { //not matched
+				badge.show();
+				$scope.armPopover();
+				$scope.notMatchedCSS("false");
+			} else {
+				$scope.matchedCSS();
+			}
+		});
+      } else {
+        console.log("Predict: getPredSessionObj: we have stored this previously. retreive the ignored value. ");
+		if(predictedValue != g_form.getDisplayBox(_reqObj.field).value ) { //not matched
+				badge.show();
+				$scope.armPopover();
+				$scope.notMatchedCSS(JSON.parse(result).ignored);
+		} else {
+			$scope.matchedCSS();
+		}
+      }
+    }); //end callback 
+  }; //end updateView
+
+  //This function saves the predicted value to our session. The business rule "Store Astound Value From Session" then saves this value into the x_na_astound_subcat field on any insert or update event of the incident to track and save our most recently predicted value. 
+  $scope.storePredSessionObj = function(predictedValueObj,ignored,cb) {
+	  console.log("Astound Predict: $scope.storePredSessionObj ignored=" + ignored);    
+      try {
+            var url = "/api/x_na_astound_predi/session/post?predictedValue=" + predictedValueObj.id + "&table=" + _reqObj.table + "&sys_id=" + _reqObj.sys_id 
+              + "&event_guid=" + predictedValueObj.event_guid + "&ignored=" + ignored;
+            $http.post(url).success(function(response){
+                cb();
+            });
+        } catch(err) {console.error("Astound Error: error posting to " + url + "\n" + err);}
+  };
+  
+  $scope.getPredSessionObj = function(predictedValueObj,cb) {
+	  console.log("Astound Predict: $scope.getPredSessionObj");    
+      var url = "/api/x_na_astound_predi/session/get?predictedValue=" + predictedValueObj.id + "&table=" + _reqObj.table + "&sys_id=" + _reqObj.sys_id;
+	  $http.get(url)
+		.then(function (response){
+		  if(response) {
+			  $scope.curPredSessionObj = response.data;
+			  console.log("Astound Predict: /api/x_na_astound_predi/session/get SUCCESS. the response.data.result: " + response.data.result + " and $scope.curPredSessionObj = " + $scope.curPredSessionObj);
+			  cb(response.data.result);
+		  }
+		}).catch(function(response) {
+		  console.error('Error occurred:', response.status, response.data);
+		});
+  };//end getPredSessionObj 
+    
+  $scope.armPopover = function() {
+   Event.observe('popover_btn_cancel', 'click', ignoreClicked); 
+   function ignoreClicked() {
+    //ignore button was clicked. here we need to store the decision to ignore the prediction or not. 
+    $scope.storePredSessionObj(json_response[0],true,function() {
+		console.log("storePredSessionObj case 2");
+        return false; 
+      });
+    }//end ignoreClicked
+    
+    Event.observe('popover_btn_confirm', 'click', okClicked); 
+    function okClicked() {
+      $scope.storePredSessionObj(json_response[0],false,function(){console.log("storePredSessionObj case 3");});
+	  g_form.setValue('category', json_response[0].category);
+	  g_form.setValue(_reqObj.field, json_response[0].id);
+	  $scope.matchedCSS(); 
+    }
+  };//end scope.armPopover
+  
+  //CSS
+  
+  $scope.loadingCSS = function() {
+  };
+
+  $scope.errorCSS = function() {
+    //$j("#astound_am_loader").hide();
+   badge.hide();
+  };
+
+  $scope.matchedCSS = function() {
+	console.log("scope.matchedCSS");
+    badge.show();
+    badge.addClass("disabled");
+    badge.removeClass("icon-warning-circle");
+    badge.addClass("icon-success-circle");
+  };
+
+  $scope.notMatchedCSS = function(isIgnoredString) {
+    console.log("Astound Predict: We're in notMatchedCSS. isIgnoredString is a " + typeof isIgnoredString + " with value " + isIgnoredString);
+    badge.show();
+    document.getElementById("astound_am_field_suggestion").innerHTML = predictedValue;
+    document.getElementById("astound_am_field_suggestion_score").innerHTML = precision + "%";
+    badge.removeClass("icon-success-circle");
+    badge.removeClass("disabled");
+    badge.addClass("icon-warning-circle");
+    if(g_form.getValue("state") != "6" && isIgnoredString != "true") { //don't toggle on the popover if the state is 6 (resolved) or if the user ignored this previously.  
+      badge.popover('toggle');
+    }
+  };
+  
+  //Create and add the Event Listeners. 
+  $scope.setFieldWatch = function(searchType, searchField){
+    if (debugAstoundPredict == "debug")
+      console.log("AstoundPredict: setFieldWatch: " + searchType + " " + searchField);
+    var field = '';
+    var fieldType = '';
+      try{
+        if (g_form.getControl(searchField)){
+          fieldType = $(g_form.getControl(searchField)).type;
+          field = $(g_form.getControl(searchField)).id;
+          
+          if (fieldType.toString().indexOf('text') > -1) {
+            Event.observe(field, 'keyup', function(event){$scope.checkField(searchField, event);});     
+          } else if(fieldType.toString().indexOf('hidden') > -1) {
+            Event.observe("sys_display."+field, 'change', function(event){$scope.checkField("sys_display."+searchField, event);});    
+          } else {
+            Event.observe(field, 'change', function(event){$scope.checkField(searchField, event);});
+          }
+        }
+        else if (debugAstoundPredict == "debug")
+          console.log('AstoundPredict: Cannot setup field watch on nonexistant field ' + searchField);
+      }
+      catch(errForm){
+        if (debugAstoundPredict == "debug")
+          console.log('AstoundPredict: Error setting up field watch on field ' + searchField + ' of type ' + fieldType);
+      }
+  };
+
+  //One of the fields we are listening on has changed.
+  $scope.checkField = function(field, event){
+    if (debugAstoundPredict == "debug")
+      console.log("AstoundPredict: checkField. field:" + field +" event:" + event);
+    var keyPressed;
+    if (event)
+      keyPressed = event.keyCode || event.charCode;
+      clearTimeout($scope.timer);
+      $scope.timer = setTimeout(function validate(){
+        $scope.predict();
+      },$scope.delayInterval);
+  };
+}//end PredictAppCtrlFunction
+
+//define the module, also known as the "app". 
+var predictModule = angular.module('predictModule',['ui.bootstrap','ngAnimate']);
+
+//define the app's controller.
+predictModule.controller('PredictAppCtrl', PredictAppCtrlFunction);]]></script>
+        <script_name>client_logic</script_name>
+        <sys_class_name>sys_ui_script</sys_class_name>
+        <sys_created_by>ben.phillips</sys_created_by>
+        <sys_created_on>2018-02-15 22:55:56</sys_created_on>
+        <sys_id>f193b875db9c9b00bfa8d001cf96190a</sys_id>
+        <sys_mod_count>173</sys_mod_count>
+        <sys_name>x_na_astound_predi.client_logic</sys_name>
+        <sys_package display_value="Astound Predict" source="x_na_astound_predi">b8af7751db989b00bfa8d001cf961929</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="Astound Predict">b8af7751db989b00bfa8d001cf961929</sys_scope>
+        <sys_update_name>sys_ui_script_f193b875db9c9b00bfa8d001cf96190a</sys_update_name>
+        <sys_updated_by>ben.phillips</sys_updated_by>
+        <sys_updated_on>2018-04-03 00:24:49</sys_updated_on>
+        <use_scoped_format>false</use_scoped_format>
+    </sys_ui_script>
+</record_update>

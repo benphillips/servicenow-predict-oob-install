@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_ui_macro">
+    <sys_ui_macro action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <category>general</category>
+        <description/>
+        <media_type/>
+        <name>predict_app</name>
+        <scoped_name>x_na_astound_predi_predict_app</scoped_name>
+        <sys_class_name>sys_ui_macro</sys_class_name>
+        <sys_created_by>ben.phillips</sys_created_by>
+        <sys_created_on>2018-02-15 20:54:30</sys_created_on>
+        <sys_id>f7c610fddb5c9b00bfa8d001cf961912</sys_id>
+        <sys_mod_count>43</sys_mod_count>
+        <sys_name>predict_app</sys_name>
+        <sys_package display_value="Astound Predict" source="x_na_astound_predi">b8af7751db989b00bfa8d001cf961929</sys_package>
+        <sys_policy>protected</sys_policy>
+        <sys_scope display_value="Astound Predict">b8af7751db989b00bfa8d001cf961929</sys_scope>
+        <sys_update_name>sys_ui_macro_f7c610fddb5c9b00bfa8d001cf961912</sys_update_name>
+        <sys_updated_by>ben.phillips</sys_updated_by>
+        <sys_updated_on>2018-04-03 20:22:22</sys_updated_on>
+        <xml><![CDATA[<?xml version="1.0" encoding="utf-8" ?> 
+<j:jelly trim="false" xmlns:j="jelly:core" xmlns:g="glide" xmlns:j2="null" xmlns:g2="null">
+  
+  <g:requires name="x_na_astound_predi.angular.min.jsdbx"/>
+  <g:requires name="x_na_astound_predi.angular_animate_min.jsdbx"/>
+  <g:requires name="x_na_astound_predi.ui_bootstrap.min.jsdbx"/>
+  <g:requires name="x_na_astound_predi.client_logic.jsdbx"/>
+  
+  <g2:evaluate var="jvar_domain" expression="var domain = current.sys_domain; domain;"/>
+  <g2:evaluate var="jvar_targetField" expression="var t = gs.getProperty('x_na_astound_predi.target.1.field'); t;"/>
+  
+  <g2:evaluate var="jvar_parent_domain" expression="var parentDomain = current.sys_domain.parent;
+    parentDomain;"/>
+  
+  <!--Gather system properties to define app behavior-->
+  <j:set var="jvar_debug_astoundpredict" value="${gs.getProperty('x_na_astound_predi.logging.verbosity')}"/>
+
+  <!--Set variables for client script usage-->
+  <script>
+    itemID = '${jvar_item_id}';
+    pageID = '${RP.getParameterValue('sys_id')}';
+    debugAstoundPredict = "${jvar_debug_astoundpredict}";
+    targetField = "$[jvar_targetField]";
+    domain = "$[jvar_domain]";
+    parentDomain = "$[jvar_parent_domain]";
+    if(domain == "9c193973dbc50300822cfb051d96190c" || parentDomain == "93bef8b3db450300822cfb051d961961") {
+      isAustralia = true;
+    } else {isAustralia = false;}
+  </script>
+  
+  <style>
+    #astoundFieldBadge { 
+      margin-right: 5px;
+    }
+    #astound_am_popover {
+      min-width: 146px !important;
+    }
+    p#astound_am_field_suggestion_score {
+      font-size: 16px;
+      text-align: center;
+      color: #339999; // astound-seagreen;
+	  margin: 0px !important;
+    }
+   
+	#astound_am_field_suggestion {font-size: 14px;}
+    
+	p.extra_good_suggestion {
+      color: #339999 !important;
+    }
+    .icon-success-circle {
+      color:  #339999; //$color-positive;
+    }
+
+    .icon-warning-circle {
+      color: #FE8A30; // $color-warning;
+    }
+    .icon-loading {
+      color: #278EFC; //$color-blue;
+    }   
+    #astound_am_loader {
+      position: relative;
+      left: -3px;
+      top: -1px;    
+    }
+    .astound_powered_by_astound {
+      float: right;
+	  display: inline;
+    }
+    #astound_am_popover button, #astound_am_popover #astound_am_field_suggestion, #astound_am_field_suggestion  {
+      text-align: center !important;
+    }
+    #astound_am_popover div.col-md-6 {
+      padding-left: 4px !important; 
+      padding-right: 4px !important; 
+    }
+    #predictModule {
+      display: inline;
+    }
+    p.navbar-title-caption {
+      font-size: 12px;
+	  display: inline;
+    }
+	p#astound_am_confidence_text {
+	  font-size: 0.8em;
+	  color: #333;
+	  padding: 2px 0px 0px 0px  !important;
+	  margin: 0px !important;
+	  text-align: center;
+	}
+	.popover-body .row {border-bottom: none;}
+  </style>
+
+    <div id="predictModule" sn-ng-formatter="predictModule" ng-controller="PredictAppCtrl as cnt" ng-init="init()" >
+      <div id="astound_am_popover" style="display:none">
+         <div class="popover-header">
+           <p class="navbar-title-caption">Astound Predict</p>
+		   <div class="astound_powered_by_astound"><a href="https://astound.ai/" target="_blank"><img style="padding-left:3px" src="astound-predict-logo-small.png" height="12"/></a></div>
+         </div>
+         <div class="popover-body">
+          <div id="astound_am_field_suggestion"></div>
+           <div><p id="astound_am_field_suggestion_score"></p><p id="astound_am_confidence_text">Confidence</p></div>
+            <div class="row">
+             <div class="col-md-6">
+               <button class="btn-block btn-sm btn btn-primary" type="button" data-dismiss="popover" id="popover_btn_confirm">Accept</button>
+             </div>
+             <div class="col-md-6">
+               <button class="btn-block btn-sm btn btn-default" type="button" data-dismiss="popover" id="popover_btn_cancel">Ignore</button>
+             </div>
+           </div>
+         </div>
+      </div>
+
+      <a id="astoundFieldBadge"
+         ng-click="$scope.badgeOnClick();"
+         data-placement="top"
+         data-toggle="popover" 
+         data-target="#astound_am_popover" 
+         data-trigger="click manual"
+         class="sn-popover-basic btn btn-default btn-ref icon" 
+         style="display:none"
+      ></a> 
+    </div><!-- /predictModule -->
+  
+     <!-- australia deactivation -->    
+    <script>
+      if(isAustralia) {
+        $j('predictModule').remove();
+      }
+    </script>
+    <!-- end australia deactivation --> 
+  
+    <script>
+      if(!isAustralia) {
+        angular.element(document).ready(function() {
+          var element = angular.element(document.getElementById('predictModule'));
+          var isInitialized = element.injector();
+          console.log("AstoundPredict: isInitialized:"+isInitialized);
+          if (!isInitialized) {
+            angular.bootstrap(document.getElementById('predictModule'), ['predictModule']);
+          }
+        });
+      }
+    </script>
+  
+</j:jelly>]]></xml>
+    </sys_ui_macro>
+</record_update>
