@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update>
+    <sys_documentation element="x_na_astound_predi_assignment_group" label="Astound Predict Assignment Group" language="en" table="incident">
+        <sys_documentation action="INSERT_OR_UPDATE">
+            <element>x_na_astound_predi_assignment_group</element>
+            <help/>
+            <hint/>
+            <label>Astound Predict Assignment Group</label>
+            <language>en</language>
+            <name>incident</name>
+            <plural>Astound Predict Assignment Groups</plural>
+            <sys_class_name>sys_documentation</sys_class_name>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2018-04-20 22:55:42</sys_created_on>
+            <sys_id>d9691e164fad1300a8a1b82ca310c715</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_name>Astound Predict Assignment Group</sys_name>
+            <sys_package display_value="Astound Predict" source="x_na_astound_predi">b8af7751db989b00bfa8d001cf961929</sys_package>
+            <sys_policy/>
+            <sys_scope display_value="Astound Predict">b8af7751db989b00bfa8d001cf961929</sys_scope>
+            <sys_update_name>sys_documentation_incident_x_na_astound_predi_assignment_group_en</sys_update_name>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2018-04-20 22:55:42</sys_updated_on>
+            <url/>
+            <url_target/>
+        </sys_documentation>
+    </sys_documentation>
+</record_update>
